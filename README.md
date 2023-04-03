@@ -1,5 +1,7 @@
 # arxiv GPT
 
+for developer: read openai's documentation or [husisy/learning/openai/readme.md](https://github.com/husisy/learning/tree/master/python/openai) first
+
 similar project
 
 1. [arxiv-summary](https://www.arxiv-summary.com) [reddit](https://www.reddit.com/r/MachineLearning/comments/10cgm8d/p_i_built_arxivsummarycom_a_list_of_gpt3/)
