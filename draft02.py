@@ -32,6 +32,7 @@ def get_arxiv_recent_targz_url():
     ret = ['https://arxiv.org/e-print/'+x[8:] for x in tmp0]
     return ret
 
+
 def extract_unknown_arxiv_file(file, directory):
     desc = magic.from_file(file)
     if desc.startswith('gzip compressed data'):
@@ -83,6 +84,7 @@ def download_tex_targz_file(url_list, directory='data'):
 
 
 def get_tex_split_text(tex_file):
+    # if error, return None
     with open(tex_file, 'r', encoding='utf-8') as fid:
         tex_text = fid.read()
     # split raw text by section
@@ -90,9 +92,12 @@ def get_tex_split_text(tex_file):
     tmp0 = pylatexenc.latexwalker.LatexWalker(tex_text.strip()).get_latex_nodes(pos=0)[0]
     tmp1 = [x for x in tmp0 if x.isNodeType(pylatexenc.latexwalker.LatexEnvironmentNode) and x.environmentname=='document']
     if len(tmp1)==0:
-        ind0 = re.search(r'\\begin\{document\}', tex_text).span()[1]
-        ind1 = re.search(r'\\end\{document\}', tex_text).span()[0]
-        # TODO handle error if missing this two
+        tmp0 = re.search(r'\\begin\{document\}', tex_text)
+        tmp1 = re.search(r'\\end\{document\}', tex_text)
+        if (tmp0 is None) or (tmp1 is None):
+            return None
+        ind0 = tmp0.span()[1]
+        ind1 = tmp1.span()[0]
         tex_text = tex_text[ind0:ind1]
         tex_nodelist = pylatexenc.latexwalker.LatexWalker(tex_text.strip()).get_latex_nodes(pos=0)[0]
     else:

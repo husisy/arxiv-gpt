@@ -10,36 +10,13 @@ import openai
 import openai.embeddings_utils
 import numpy as np
 
-from utils import download_url_and_save, convert_pdf_to_text, _MY_REQUEST_HEADERS
+from utils import download_url_and_save, convert_pdf_to_text, _MY_REQUEST_HEADERS, NaiveChatGPT
 
 dotenv.load_dotenv()
 openai.api_key = os.environ["OPENAI_API_KEY"]
 
 if not os.path.exists('data'):
     os.makedirs('data')
-
-class NaiveChatGPT:
-    def __init__(self) -> None:
-        self.message_list = [{"role": "system", "content": "You are a helpful assistant."},]
-        self.response = None #for debug only
-
-    def reset(self):
-        self.message_list = self.message_list[:1]
-
-    def chat(self, message='', tag_print=True, tag_return=False):
-        message = str(message)
-        if message: #skip if empty
-            self.message_list.append({"role": "user", "content": str(message)})
-            self.response = openai.ChatCompletion.create(model="gpt-3.5-turbo", messages=self.message_list)
-            tmp0 = self.response.choices[0].message.content
-            self.message_list.append({"role": "assistant", "content": tmp0})
-            if tag_print:
-                print(tmp0)
-            if tag_return:
-                return tmp0
-
-
-# TODO ContextChatGPT
 
 chatgpt = NaiveChatGPT()
 

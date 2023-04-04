@@ -1,6 +1,11 @@
 # arxiv GPT
 
-for developer: read openai's documentation or [husisy/learning/openai/readme.md](https://github.com/husisy/learning/tree/master/python/openai) first
+for developer
+
+1. read openai's documentation or [husisy/learning/openai/readme.md](https://github.com/husisy/learning/tree/master/python/openai) first
+2. do not put API-key (openai, WEAVIATE) in the git history
+3. access openai api key only in US-VPS
+
 
 similar project
 
@@ -55,3 +60,13 @@ brainstom: 用户有哪些关心的问题
 micromamba create -n arxiv
 micromamba install -n arxiv -c conda-forge cython matplotlib h5py pillow protobuf scipy requests tqdm flask ipython openai python-dotenv tiktoken lxml tqdm pdfminer.six
 ```
+
+TODO
+
+1. [ ] naive website
+2. [ ] website login to avoid abuse login (api key is expensive)
+3. [ ] sqlite: a database to store the path
+4. [ ] public `/data` folder to store the downloaded tex file
+5. [ ] website: store user's input
+6. [ ] website: collect user's feedback, like which papers should be included
+7. [ ] website: how to show chating messages
