@@ -1,7 +1,9 @@
 import os
 import dotenv
 
-from database import init_sqlite3_database, crawl_arxiv_recent_paper
+from database_utils import init_sqlite3_database
+
+from crawl_utils import crawl_arxiv_recent_paper
 
 dotenv.load_dotenv()
 

@@ -58,7 +58,7 @@ brainstom: 用户有哪些关心的问题
 
 ```bash
 micromamba create -n arxiv
-micromamba install -n arxiv -c conda-forge cython matplotlib h5py pillow protobuf scipy requests tqdm flask ipython openai python-dotenv tiktoken lxml tqdm pdfminer.six python-magic
+micromamba install -n arxiv -c conda-forge cython matplotlib h5py pillow protobuf scipy requests tqdm flask ipython openai python-dotenv tiktoken lxml tqdm pdfminer.six python-magic pylatexenc
 micromamba activate arxiv
 ```
 
@@ -77,7 +77,6 @@ folder structure
 ```txt
 arxiv.sqlite3
 arxiv/
-├── sqlite3.db
 ├── 2101.00001/ (arxivID)
 │   ├── arxivID.pdf (download if not exists)
 │   ├── arxivID.txt (optional)
@@ -85,6 +84,7 @@ arxiv/
 │   ├── arxivID.tex (unique)
 │   ├── meta-info.json (abstract, title, author_list, subject)
 │   ├── chunk-tex.json (list os string)
+│   ├── pdf-text.txt (extracted from pdf)
 │   ├── untar/ (extract if not exist)
 │   │   ├── 2101.00001v1
 ```
@@ -98,5 +98,6 @@ arxivID: str
 meta_info_json_path: str
 pdf_path: str('' if not exist)
 tex_path: str ('' if not exist)
-chunk_tex_json_path: str ('' if not exist)
+chunk_text_json_path: str ('' if not exist)
+num_chunk: int
 ```
