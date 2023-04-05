@@ -29,41 +29,6 @@ def download_url_and_save(url, filename=None, directory='.', headers=None, proxi
     return filepath
 
 
-# TODO make a cache
-# https://stackoverflow.com/a/93029/7290857
-tmp0 = (chr(i) for i in range(sys.maxunicode)) #all character
-tmp1 = ''.join(c for c in tmp0 if (unicodedata.category(c)=='Cc') and c not in '\t\n') #all control character
-_CONTROL_CHAR_RE = re.compile('[%s]' % re.escape(tmp1))
-_REMOVE_BEGIN_ARXIV_RE = re.compile("$(.?\n)+", flags=re.MULTILINE)
-_REMOVE_CONNECTING_RE = re.compile('-\n', flags=re.MULTILINE)
-_REMOVE_LATEXIT_RE = re.compile('latexit(.*)/latexit', flags=re.MULTILINE)
-_REMOVE_NEWLINE_RE = re.compile('(\S)\n(\S)', flags=re.MULTILINE)
-_MISC00_RE = re.compile('ﬀ')
-
-
-def convert_pdf_to_text(pdf_path_list):
-    # TODO see github/chatpaper how to cleanup pdf
-    for pdf_path in pdf_path_list:
-        assert pdf_path.endswith('.pdf')
-        text_path = pdf_path[:-4] + '.txt'
-        if os.path.exists(text_path):
-            print(f'{text_path} already exists, skip it')
-        else:
-            print(f'processing {pdf_path}')
-            with open(pdf_path, 'rb') as fid:
-                text_ori = pdfminer.high_level.extract_text(fid)
-            text0 = _CONTROL_CHAR_RE.sub('', text_ori)
-            text1 = _REMOVE_BEGIN_ARXIV_RE.sub('', text0, count=1)
-            text2 = _REMOVE_LATEXIT_RE.sub('', text1)
-
-            text3 = _REMOVE_CONNECTING_RE.sub('', text2)
-            text4 = _REMOVE_NEWLINE_RE.sub(r'\1 \2', text3)
-            text4 = _REMOVE_NEWLINE_RE.sub(r'\1 \2', text4) #sometimes we need do this several time
-            text5 = _MISC00_RE.sub('ff', text4)
-            with open(text_path, 'w', encoding='utf-8') as fid:
-                fid.write(text5)
-
-
 # caller's duty to set openai.api_key
 class NaiveChatGPT:
     def __init__(self) -> None:
