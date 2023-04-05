@@ -58,7 +58,8 @@ brainstom: 用户有哪些关心的问题
 
 ```bash
 micromamba create -n arxiv
-micromamba install -n arxiv -c conda-forge cython matplotlib h5py pillow protobuf scipy requests tqdm flask ipython openai python-dotenv tiktoken lxml tqdm pdfminer.six
+micromamba install -n arxiv -c conda-forge cython matplotlib h5py pillow protobuf scipy requests tqdm flask ipython openai python-dotenv tiktoken lxml tqdm pdfminer.six python-magic
+micromamba activate arxiv
 ```
 
 TODO
@@ -70,3 +71,32 @@ TODO
 5. [ ] website: store user's input
 6. [ ] website: collect user's feedback, like which papers should be included
 7. [ ] website: how to show chating messages
+
+folder structure
+
+```txt
+arxiv.sqlite3
+arxiv/
+├── sqlite3.db
+├── 2101.00001/ (arxivID)
+│   ├── arxivID.pdf (download if not exists)
+│   ├── arxivID.txt (optional)
+│   ├── arxivID.tar.gz (download if not exists)
+│   ├── arxivID.tex (unique)
+│   ├── meta-info.json (abstract, title, author_list, subject)
+│   ├── chunk-tex.json (list os string)
+│   ├── untar/ (extract if not exist)
+│   │   ├── 2101.00001v1
+```
+
+`arxiv.sqlite3 table=paper`
+
+```txt
+# database paper
+pid: int (primary key)
+arxivID: str
+meta_info_json_path: str
+pdf_path: str('' if not exist)
+tex_path: str ('' if not exist)
+chunk_tex_json_path: str ('' if not exist)
+```

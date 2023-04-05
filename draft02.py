@@ -12,8 +12,7 @@ import pylatexenc.latexwalker
 
 from utils import _MY_REQUEST_HEADERS, download_url_and_save
 
-# TODO parse the tex file
-
+# TODO save to database
 
 def get_arxiv_recent_targz_url():
     # TODO title author abstract
