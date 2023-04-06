@@ -7,6 +7,7 @@ import openai.embeddings_utils
 import numpy as np
 
 from database_utils import sqlite3_load_all_paper_from, vector_database_find_close_chunk
+from crawl_utils import crawl_one_arxiv_paper
 
 # caller's duty to set openai.api_key
 class NaiveChatGPT:
@@ -73,6 +74,12 @@ class ArxivChatGPT:
 
         self._db_paper_i = None
         self.use_local_npy = use_local_npy
+
+    def add_arxiv_paper_to_db(self, arxivID):
+        assert isinstance(arxivID, str)
+        crawl_one_arxiv_paper(arxivID, tag_commit_sqlite3=True)
+        self._db_paper_list = sqlite3_load_all_paper_from()
+        self.arxivID_list = [x['arxivID'] for x in self._db_paper_list]
 
     def list_arxiv(self, num_print=-1):
         db_paper_list = self._db_paper_list
@@ -153,35 +160,3 @@ class ArxivChatGPT:
                 print(tmp0)
             if tag_return:
                 return tmp0
-
-# _openai_qa_template = ("Answer the question based on the context below, and if the question can't be answered based on the context, "
-#             "say \"I don't know\"\n\nContext: {context}\n\n---\n\nQuestion: {question}\nAnswer:")
-
-
-# def answer_question(question, text_list, embedding_np, max_context_len=1800, tag_print_context=False):
-#     """
-#     Answer a question based on the most similar context from the dataframe texts
-#     text_list(list, tuple(text:str, num_token:int))
-#     TODO response_max_tokens=150
-#     """
-#     assert all(len(x)==2 for x in text_list)
-#     assert len(text_list) == embedding_np.shape[0]
-#     text_len_list = np.array([x[1] for x in text_list])
-#     text_str_list = [x[0] for x in text_list]
-
-#     q_embedding = openai.Embedding.create(input=question, engine='text-embedding-ada-002')['data'][0]['embedding']
-#     distance = np.array(openai.embeddings_utils.distances_from_embeddings(q_embedding, embedding_np, distance_metric='cosine')) # 0: cloest
-#     ind0 = np.argsort(distance)
-#     tmp0 = np.nonzero((text_len_list[ind0] + 4).cumsum() > max_context_len)[0].min()
-#     context_text_list = [text_str_list[x] for x in ind0[:tmp0]]
-#     context_text = "\n\n###\n\n".join(context_text_list)
-#     if tag_print_context:
-#         print(f"Context:\n{context_text}\n\n")
-#     prompt = _openai_qa_template.format(context=context_text, question=question)
-#     try:
-#         chatgpt.reset()
-#         ret = chatgpt.chat(prompt, tag_print=False, tag_return=True)
-#     except Exception as e:
-#         print(e)
-#         ret = ""
-#     return ret

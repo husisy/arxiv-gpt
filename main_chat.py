@@ -12,6 +12,9 @@ if __name__=='__main__':
     chatgpt.list_arxiv(num_print=5)
     chatgpt.select(1)
 
+    # chatgpt.add_arxiv_paper_to_db('2209.10934')
+    # chatgpt.select('2209.10934')
+
     chatgpt.chat("What is the main contribution of this paper?")
 
     question = "What is the main contribution of this paper?"
