@@ -1,17 +1,38 @@
-# arxiv GPT
+# ArxivChatGPT
 
-for developer
-
-1. read openai's documentation or [husisy/learning/openai/readme.md](https://github.com/husisy/learning/tree/master/python/openai) first
-2. do not put API-key (openai, WEAVIATE) in the git history
-3. access openai api key only in US-VPS
-
+Chat with arxiv paper
 
 similar project
 
 1. [arxiv-summary](https://www.arxiv-summary.com) [reddit](https://www.reddit.com/r/MachineLearning/comments/10cgm8d/p_i_built_arxivsummarycom_a_list_of_gpt3/)
 2. github-chatpaper
 3. arxiv-sanity [github](https://github.com/karpathy/arxiv-sanity-lite) [website](https://arxiv-sanity-lite.com/)
+
+## setup local development environment
+
+NOTICE
+
+1. read openai's documentation or [husisy/learning/openai/readme.md](https://github.com/husisy/learning/tree/master/python/openai) first
+2. do **NOT** put API-key (openai, WEAVIATE) in the git history
+3. access openai api key only in US-VPS
+
+```bash
+micromamba create -n arxiv
+micromamba install -n arxiv -c conda-forge cython matplotlib h5py pillow protobuf scipy requests tqdm flask ipython openai python-dotenv tiktoken lxml tqdm pdfminer.six python-magic pylatexenc
+micromamba activate arxiv
+pip install weaviate-client
+```
+
+1. complete the `.env` file from `.env.example`
+2. run `python main_chat.py`
+3. (optional) update database: `python main_database.py`
+
+```Python
+>>> from main_chat import *
+>>> chatgpt.list_arxiv(num_print=5)
+>>> chatgpt.select('2304.02241')
+>>> chatgpt.chat("What is the main contribution of this paper?")
+```
 
 计划
 
@@ -38,6 +59,35 @@ flow chart
    * 可能的错误：多个`.tex文件`，`.tex`文件包含`\input{}`，非`section`分段
    * 超参数，每个chunk的最大token数量
 4. 调用openai-ada-002将每个chunk映射为矢量
+5. price
+   * about `0.01USD` for converting one paper into chunk vectors
+   * about `0.002USD` for each question
+
+`.env` environment parameters
+
+```bash
+# weaviate database api key
+WEAVIATE_API_URL=https://xxx
+WEAVIATE_API_KEY=yyy
+
+OPENAI_API_KEY=sk-zzz
+
+# sqlite3 database path
+SQLITE3_DB_PATH=/path/to/arxiv.sqlite3
+
+# arxiv data folder
+ARXIV_DIRECTORY=/path/to/arxiv-folder
+
+# how many token for each chunk: 400 is chosen without too much consideration
+ARXIVGPT_MAX_TOKEN_PER_CHUNK=400
+
+# how many token for each question: 1800 is chosen without too much consideration
+ARXIVGPT_MAX_TOKEN_PER_QA=1800
+
+# 1: save chunk-vector.npy locally, mainly for debug
+# 0: not save
+ARXIVGPT_SAVE_NUMPY_VECTOR=1
+```
 
 brainstom: 用户有哪些关心的问题
 
@@ -56,17 +106,6 @@ brainstom: 用户有哪些关心的问题
 8. explain the word "xxx" in command sense
 9. TODO 常见的问题先问掉并存起来
 
-```bash
-micromamba create -n arxiv
-micromamba install -n arxiv -c conda-forge cython matplotlib h5py pillow protobuf scipy requests tqdm flask ipython openai python-dotenv tiktoken lxml tqdm pdfminer.six python-magic pylatexenc
-micromamba activate arxiv
-pip install weaviate-client
-
-# https://github.com/openai/openai-cookbook/tree/main/examples/vector_databases/weaviate
-micromamba create -n test00
-micromamba install -n test00 -c conda-forge cython matplotlib h5py pillow protobuf scipy requests tqdm flask ipython openai python-dotenv tiktoken lxml tqdm python-magic datasets apache-beam
-```
-
 TODO
 
 1. [ ] naive website
@@ -77,19 +116,26 @@ TODO
 6. [ ] website: collect user's feedback, like which papers should be included
 7. [ ] website: how to show chating messages
 
-folder structure
+arxiv folder structure
 
 ```txt
-arxiv.sqlite3
 arxiv/
 ├── 2101.00001/ (arxivID)
-│   ├── arxivID.pdf (download if not exists)
-│   ├── arxivID.tar.gz (download if not exists)
-│   ├── arxivID.tex (unique)
+│   ├── main.pdf
+│   ├── main.tar.gz
+│   ├── main.tex
 │   ├── meta-info.json (abstract, title, author_list, subject)
 │   ├── chunk-text.json (list os string)
-│   ├── untar/ (extract if not exist)
-│   │   ├── 2101.00001v1
+│   ├── chunk-vector.npy (numpy,float64,(N,1536)): optional
+│   └── untar/ (extract from .tar.gz)
+└── 2304.01411/
+    ├── main.pdf
+    ├── main.tar.gz
+    ├── main.tex
+    ├── meta-info.json
+    ├── chunk-text.json
+    ├── chunk-vector.npy
+    └── untar/
 ```
 
 `arxiv.sqlite3 table=paper`
@@ -112,5 +158,12 @@ chunk: text
 arxiv_id: string
 index: int
 num_chunk: int
+num_token: int
 vector (ada-002)
+```
+
+misc
+
+```bash
+tar czvf arxivgpt-db.tar.gz data
 ```

@@ -4,8 +4,11 @@ import re
 import gzip
 import tarfile
 import sys
+import time
+import math
 import unicodedata
 
+import numpy as np
 import openai
 import tiktoken
 import magic
@@ -52,6 +55,7 @@ def resolve_tex_input(text, directory):
                 text = text[:ind0] + text[(ind0+1):]
     return text
 
+_TEX_COMMENT_RE = re.compile(r'(?<!\\)%.*')
 
 def try_except_make_main_tex_file(directory):
     texpath_list = [os.path.join(directory, x) for x in os.listdir(directory) if x.endswith('.tex')]
@@ -67,7 +71,8 @@ def try_except_make_main_tex_file(directory):
                 print(f'Error in resolving tex input "{texpath_i}"')
     # TODO handle other .tex files except main.tex
     if len(text_list)>=1:
-        ret = max(text_list, key=len)
+        tmp0 = max(text_list, key=len)
+        ret = _TEX_COMMENT_RE.sub('', tmp0)
     else:
         ret = None
     return ret
@@ -133,7 +138,7 @@ _CONTROL_CHAR_RE = re.compile('[%s]' % re.escape(tmp1))
 _REMOVE_BEGIN_ARXIV_RE = re.compile("$(.?\n)+", flags=re.MULTILINE)
 _REMOVE_CONNECTING_RE = re.compile('-\n', flags=re.MULTILINE)
 _REMOVE_LATEXIT_RE = re.compile('latexit(.*)/latexit', flags=re.MULTILINE)
-_REMOVE_NEWLINE_RE = re.compile('(\S)\n(\S)', flags=re.MULTILINE)
+_REMOVE_NEWLINE_RE = re.compile(r'(\S)\n(\S)', flags=re.MULTILINE)
 _MISC00_RE = re.compile('ﬀ')
 
 
@@ -160,17 +165,19 @@ def pdfpath_to_text_chunk(pdf_path):
     return text_chunk_list
 
 
-def text_chunk_to_embedding_vector(text_chunk_list):
-    # TODO vector database
-    if os.environ['ARXIVGPT_SAVE_NUMPY_VECTOR']=='1':
-        embbeding_list = []
+def text_chunk_list_to_numpy_vector(text_chunk_list, batch_size=20):
+    assert all(isinstance(x,str) for x in text_chunk_list)
+    num_chunk = len(text_chunk_list)
+    tmp0 = [x*batch_size for x in range(math.ceil(num_chunk/batch_size) + 1)]
+    text_chunk_list_batch = [text_chunk_list[x:y] for x,y in zip(tmp0,tmp0[1:])]
+    embedding_list = []
+    for batch_i in text_chunk_list_batch:
         # rate limiting
         # https://platform.openai.com/docs/guides/rate-limits/what-are-the-rate-limits-for-our-api
-        for x,_ in tqdm(text_chunk_list):
-            time.sleep(2.5) #make sure not exceed 20 requests per minutes
-            tmp0 = np.array(openai.Embedding.create(input=x, engine='text-embedding-ada-002')['data'][0]['embedding'], dtype=np.float64)
-            embbeding_list.append(tmp0)
-        tmp0 = os.path.join(os.path.dirname(chunk_text_json_path), os.environ['ARXIVGPT_SAVE_NUMPY_VECTOR_FILE'])
-        np.save(tmp0, np.stack(embbeding_list, axis=0))
-
-# WEAVIATE_API_URL
+        time.sleep(2.5) #make sure not exceed 20 requests per minutes
+        response = openai.Embedding.create(input=batch_i, engine='text-embedding-ada-002')
+        tmp0 = sorted(response['data'], key=lambda x:x.index)
+        embedding_list += [x.embedding for x in tmp0]
+        print(f'embedding progress: {len(embedding_list)}/{num_chunk}')
+    embedding_np = np.array(embedding_list, dtype=np.float64)
+    return embedding_np
