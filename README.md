@@ -18,7 +18,7 @@ NOTICE
 
 ```bash
 micromamba create -n arxiv
-micromamba install -n arxiv -c conda-forge cython matplotlib h5py pillow protobuf scipy requests tqdm flask ipython openai python-dotenv tiktoken lxml tqdm pdfminer.six python-magic pylatexenc
+micromamba install -n arxiv -c conda-forge cython matplotlib h5py pillow protobuf scipy requests tqdm flask ipython openai python-dotenv tiktoken lxml tqdm pdfminer.six python-magic pylatexenc chardet
 micromamba activate arxiv
 pip install weaviate-client
 ```

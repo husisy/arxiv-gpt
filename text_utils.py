@@ -8,6 +8,7 @@ import time
 import math
 import unicodedata
 
+import chardet
 import numpy as np
 import openai
 import tiktoken
@@ -61,8 +62,15 @@ def try_except_make_main_tex_file(directory):
     texpath_list = [os.path.join(directory, x) for x in os.listdir(directory) if x.endswith('.tex')]
     text_list = []
     for texpath_i in texpath_list:
-        with open(texpath_i, 'r', encoding='utf-8') as fid:
-            text = fid.read()
+        try:
+            with open(texpath_i, 'r', encoding='utf-8') as fid:
+                text = fid.read()
+        except UnicodeDecodeError:
+            with open(texpath_i, 'rb') as fid:
+                tmp0 = fid.read()
+            tmp1 = chardet.detect(tmp0)['encoding']
+            print(f'[{texpath_i}] chardet detect encoding: {tmp1}')
+            text = tmp0.decode(tmp1)
         if r'\begin{document}' in text:
             try:
                 text_list.append(resolve_tex_input(text, os.path.dirname(texpath_i)))
