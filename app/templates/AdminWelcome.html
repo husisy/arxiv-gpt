@@ -1,0 +1,79 @@
+<!-- this is the welcome page for admin users -->
+{% extends "UserBase.html" %}
+
+{% block content %}
+    <style>
+            
+        #welcomePage {
+            width: 100%;
+                       
+            text-align: center;
+            font: italic 1em Georgia, serif;
+            font-weight: lighter;
+          
+        }
+        
+        #welcomePage div {
+            display: inline-block;
+        }
+        
+        #welcomePage>div:first-child {
+            width: 100%;
+            height: 15px;
+            font-size: 15px;
+            margin-top: 20px;
+        }
+        
+        #welcomePage>div:nth-child(2) {
+            width: 100%;
+            height: 170px;
+            font-size: 48px;
+            margin-top: 40px;
+        }
+        
+        #welcomePage>div:nth-child(3) {
+            width: 80%;
+            height: 450px;
+
+            
+        }
+        
+        #moblie div {
+            width: 420px;
+            height: 120px;
+        }
+        span{
+            color:red;
+        }
+        
+        
+    </style>
+</head>
+<body>
+
+     <div id="welcomePage">
+            <div>WELCOME, <span>ADMIN user</span></div>
+            <div>Read this page before you use this system.
+                <br> you can do these things</div>
+            <div id="moblie">
+                <div>
+                    <h1>xxx</h1>
+                </div>
+                <div>
+                   
+                    <h1>xxx</h1>
+                </div>
+                <div>
+                    
+                    <h1>xxx</h1>
+                </div>
+                <div>
+                    
+                    <h1>xxx</h1>
+                </div>
+            </div>
+        </div>
+
+</body>
+
+{% endblock %}

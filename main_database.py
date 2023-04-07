@@ -18,4 +18,4 @@ if __name__=='__main__':
 
     # TODO make it a crontab (run every day)
     crawl_arxiv_recent_paper()
-    _update_existing_arxiv_data()
+    # _update_existing_arxiv_data()

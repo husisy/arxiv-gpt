@@ -1,0 +1,20 @@
+/* css applied to both admin login and client login */
+
+.log{
+    background-color: #676969FF;
+    height: 80px;
+    padding: 10px;
+  }
+  .content{
+    background-color: #DCE2E2FF;
+    padding: 16px;
+    width: 45%;
+    margin: 0 auto;
+  }
+  h3{
+    text-align: center;
+  }
+  .submit{
+    font-size: large;
+    margin: 10px 20%;
+  }

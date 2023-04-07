@@ -1,0 +1,87 @@
+<!-- this is the page to add, delete and make user admin -->
+{% extends "UserBase.html" %}
+
+{% block content %}
+<style>
+.manageTable
+{
+	font-size: 13px;
+	margin: 40px;
+	width: 482px;
+	text-align: left;
+    margin: 0 auto;
+    border: 1px solid #69c;
+}
+.manageTable th
+{
+	padding: 13px 18px 13px 18px;
+	font-size: 13px;
+	color: rgb(9, 54, 145);
+	border-bottom: 1px dashed rgb(29, 84, 138);
+}
+.manageTable td
+{
+	padding: 7px 18px 7px 18px;
+	color: rgb(90, 90, 141);
+}
+.manageTable tbody tr:hover td
+{
+	color: rgb(44, 44, 134);
+	background: #c0c9e9;
+}
+
+h1{
+    text-align: center;
+    color: rgb(95, 149, 204);
+}
+
+.button1 {
+        display: inline-block;
+        background: rgb(125, 184, 243);  
+        color:snow;
+        font-size: 14px; 
+        border-radius: 3px;
+        margin-left: 48%;
+        margin-top: 2%;
+      
+     }
+    .button1:hover{
+        background: rgb(116, 147, 192);
+     }
+
+
+</style>
+
+
+<title >User Manager</title>
+<h1>User Manager</h1>
+<hr>
+<table class="manageTable" >
+    <thead>
+        <tr>
+            <th>User ID</th>
+            <th>User Name</th>
+            <th>Administrator or not</th>
+            <th>Delete User</th>
+            <th>Let user become Admin</th>
+        </tr>
+    </thead>
+{% for User in Users_list %}
+    <tbody>
+        <tr>
+            <td>{{ User.get_id() }}</td>
+            <td>{{ User.get_user_name()}}</td>
+            <td>{{ User.if_adm() }} </td>
+            <td>
+                <a href="{{ url_for('delete_user', user_id=User.get_id()) }}">Delete</a>
+            </td>
+            <td>
+                <a href="{{ url_for('make_admin', user_id=User.get_id()) }}"> Admin</a>
+            </td>
+        </tr>
+    </tbody>
+{% endfor %}
+</table>
+<a  class ="button1" href="{{ url_for('register') }}">&nbsp; ADD &nbsp; </a></p><br>
+
+{% endblock %}

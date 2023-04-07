@@ -4,8 +4,9 @@ import sqlite3
 import weaviate
 import numpy as np
 
-from utils import _MY_REQUEST_HEADERS, download_url_and_save
+from .utils import _MY_REQUEST_HEADERS, download_url_and_save
 
+# TODO
 
 def sqlite_insert_paper_list(paper_list):
     paper_dict = {x['arxivID']:x for x in paper_list} #remove duplicate arxivID
@@ -19,6 +20,13 @@ def sqlite_insert_paper_list(paper_list):
     sql_conn.executemany(f'INSERT INTO paper ({tmp2}) VALUES (?,?,?,?,?,?)', tmp1)
     sql_conn.commit()
     sql_conn.close()
+
+
+def sqlite_get_arxivID_by_paper_id(pid):
+    sql_conn = sqlite3.connect(os.environ['SQLITE3_DB_PATH'])
+    arxivID = sql_conn.execute('SELECT arxivID FROM paper WHERE pid = ?', (pid,)).fetchone()[0]
+    sql_conn.close()
+    return arxivID
 
 
 def sqlite3_load_all_paper_from():
@@ -177,10 +185,11 @@ def vector_database_find_close_chunk(arxivID, message, max_context_len):
     client = _get_vector_database(with_openai_api_key=True)
     nearText = {"concepts": [message]}
     tmp0 = {"path": ["arxiv_id"], "operator": "Equal", "valueString": arxivID}
-    result = client.query.get("Paper", ["chunk", "num_token"]).with_near_text(nearText).with_where(tmp0).with_additional(['certainty']).with_limit(6).do()
+    result = client.query.get("Paper", ["chunk", "num_token"]).with_near_text(nearText).with_where(tmp0).with_additional(['certainty']).with_limit(10).do()
     certainty = [x['_additional']['certainty'] for x in result['data']['Get']['Paper']] #in descending order
     num_token_list = np.array([x['num_token'] for x in result['data']['Get']['Paper']])
     chunk_text_str_list = [x['chunk'] for x in result['data']['Get']['Paper']]
-    tmp0 = np.nonzero((num_token_list + 4).cumsum() > max_context_len)[0].min()
+    np.nonzero((num_token_list + 4).cumsum() <= max_context_len)
+    tmp0 = np.nonzero((num_token_list + 4).cumsum() <= max_context_len)[0][-1] + 1
     ret = chunk_text_str_list[:tmp0]
     return ret

@@ -1,0 +1,24 @@
+{% extends "UserBase.html"%}
+{% block content %}
+
+<!-- welcome -->
+
+
+<div class="welcome">
+    What's up, {{ current_user.username }}
+</div>
+<!-- introduction -->
+<div class="intro col-lg-8 col-lg-offset-2">
+    <h1>A bit introduction:</h1>
+    Here are arxiv papers recommended by Chatgpt:
+
+    <!-- list all the paper from database -->
+    <ul>
+    {% for paper in paper_list %}
+        <li> <a href="{{ url_for('get_paper',  paper_id = paper.get_id()) }}">{{ paper.get_title() }}</a></li>
+    {% endfor %}
+    </ul>
+</div>
+
+
+{% endblock %}

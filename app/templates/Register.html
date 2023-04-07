@@ -1,0 +1,83 @@
+<!-- register page -->
+{% extends "UserBase.html" %}
+
+{% block content %}
+
+<style>
+  * {
+    padding: 0;
+    margin: 0;
+    letter-spacing: .04em;
+  }
+
+  .Register {
+    width: 240px;
+    height: 500px;
+    margin: 0 auto;
+  }
+
+  .Register .title {
+    font-size: 32px;
+    text-align: center;
+    line-height: 100px;
+    margin-top: 50px;
+  }
+
+  .Register .form .input1 {
+    width: 100%;
+    margin-bottom: 18px;
+    border: 0;
+    /* delete bg */
+    padding: 11px 0px;
+    border-bottom: 1px solid grey;
+    font-size: 16px;
+  }
+
+  .Register .form .btn1 {
+    background: #92b4f0;
+    color: snow;
+    font-size: 18px;
+    cursor: pointer;
+    border: 2px solid lightgrey;
+    width: 200px;
+    height: 30px;
+    margin-left: 20px;
+    margin-top: 10px;
+  }
+</style>
+
+<div class="Register">
+  <form action="" method="post">
+    {{ form.hidden_tag() }}
+    <div class="title"><b>Register</b></div>
+    <div class="form">
+      <p>
+        {{ form.username(size=32,placeholder="USERNAME",class_="input1")}}<br>
+        {% for error in form.username.errors %}
+        <span style="color: red;">[{{ error }}]</span>
+        {% endfor %}
+      </p>
+      <p>
+        {{ form.email(size=64,placeholder="EMAIL",class_="input1")}}<br>
+        {% for error in form.email.errors %}
+        <span style="color: red;">[{{ error }}]</span>
+        {% endfor %}
+      </p>
+      <p>
+        {{ form.password(size=32,placeholder="PASSWORD",class_="input1")}}<br>
+        {% for error in form.password.errors %}
+        <span style="color: red;">[{{ error }}]</span>
+        {% endfor %}
+      </p>
+      <p>
+        {{ form.password2(size=32,placeholder="REPEAT PASSWORD",class_="input1")}}<br>
+        {% for error in form.password2.errors %}
+        <span style="color: red;">[{{ error }}]</span>
+        {% endfor %}
+      </p>
+      <p>{{ form.submit(class_="btn1") }}</p>
+    </div>
+  </form>
+</div>
+
+{% endblock %}

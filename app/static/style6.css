@@ -1,0 +1,25 @@
+
+.loc_header {
+  background-color:#B31B1B;
+  padding: 10px;
+  text-align: left;
+  font-family: 'Comfortaa', cursive;
+}
+
+.loc_footer {
+  background-color: #F1F1F1;
+  text-align: center;
+  padding: 10px;
+  font-family: initial;
+}
+
+.welcome{
+    font-size: 30px;
+    text-align: center;
+}
+
+.intro{
+    margin-top: 20px;
+    font-size: 25px;
+    font-weight: 100;
+}

@@ -108,6 +108,7 @@ def split_text_into_chunks(text, max_token, tokenizer):
     return ret
 
 
+# fail data/2304.03250/main.tex
 def texpath_to_text_chunk(tex_file):
     # if error, return None
     with open(tex_file, 'r', encoding='utf-8') as fid:

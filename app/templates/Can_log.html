@@ -1,0 +1,101 @@
+<!-- This is the page for normal user log in -->
+{% extends "UserBase.html" %}
+{% block content %}
+<style>
+  * {
+    padding: 0;
+    margin: 0;
+    letter-spacing: .04em;
+  }
+
+  .login {
+    width: 240px;
+    height: 500px;
+    margin: 0 auto;
+  }
+
+  .login .title {
+    font-size: 32px;
+    text-align: center;
+    line-height: 100px;
+    margin-top: 60px;
+  }
+
+  .login .formInLogin .input {
+    width: 100%;
+    margin-bottom: 18px;
+    border: 0;
+    /* delete bg */
+    padding: 11px 0px;
+    border-bottom: 1px solid grey;
+    font-size: 16px;
+
+  }
+
+  .login .formInLogin .btn {
+    background: #92b4f0;
+    color: snow;
+    font-size: 18px;
+    cursor: pointer;
+    border: 2px solid lightgrey;
+    width: 200px;
+    height: 30px;
+    margin-left: 20px;
+    margin-top: 10px;
+    padding-top: 0px;
+  }
+
+  .login .m {
+    text-align: center;
+    line-height: 78px;
+  }
+
+  .login .m a {
+    text-decoration-line: none;
+    color: #72a0f0;
+  }
+</style>
+
+<div class="login">
+  <!-- login block -->
+  <div class="title"><b>Login</b></div>
+  <form action='' method="POST">
+    {{ form.hidden_tag() }}
+    <div class="formInLogin">
+      <p>
+        <!-- username -->
+        {{ form.username(size = 60, placeholder = "USERNAME",class_="input") }}
+        {% for error in form.username.errors %}
+        <span style="color: red;">[ {{ error}} ]</span>
+        {% endfor %}
+      </p>
+      <p>
+        <!-- password-->
+        {{ form.password(size = 60, placeholder = "PASSWORD",class_="input") }}
+        {% for error in form.password.errors %}
+        <span style="color: red;">[ {{ error}} ]</span>
+        {% endfor %}
+      </p>
+      <p>
+        <!-- remember me -->
+        {{ form.remember_me() }}
+        {{ form.remember_me.label }}
+      </p>
+      <!-- submit button -->
+      <p>
+        {{form.submit(id_= 'submit',class_="btn")}}
+      </p>
+      <!-- redirect for register -->
+      <div class="m">
+        Don`t have account? <a href="{{ url_for('register') }}">Sign up</a>
+      </div>
+    </div>
+  </form>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/jquery@1.12.4/dist/jquery.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@3.3.7/dist/js/bootstrap.min.js"></script>
+<br>
+<br>
+
+{% endblock %}
+

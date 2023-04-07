@@ -1,0 +1,35 @@
+  .start{
+    background-color: #4D4F4FFF;
+    width: all;
+    height: 80px;
+  }
+  #pic{
+    height: 80px;
+    width: all;
+  }
+  .jumbotron{
+    background-color: #3D3F3FFF;
+  }
+  .jumb{
+    color: #FFFFFFFF;
+    font-style: normal;
+    text-align: center;
+  }
+  .three_form{
+    padding-left: 16px;
+  }
+  .candidate{
+    background-color: #D2D8D8FF;
+    padding: 10px;
+    width: 70%;
+  }
+  .Admin{
+    background-color: #D2D8D8FF;
+    padding: 10px;
+    width: 70%;
+  }
+  .result{
+    background-color: #D2D8D8FF;
+    padding: 10px;
+    width: 70%;
+  }

@@ -7,10 +7,10 @@ import time
 import numpy as np
 import lxml.etree
 
-from utils import download_url_and_save, _MY_REQUEST_HEADERS
-from text_utils import (extract_unknown_arxiv_file, try_except_make_main_tex_file,
+from .utils import download_url_and_save, _MY_REQUEST_HEADERS
+from .text_utils import (extract_unknown_arxiv_file, try_except_make_main_tex_file,
             texpath_to_text_chunk, pdfpath_to_text_chunk, text_chunk_list_to_numpy_vector)
-from database_utils import sqlite_insert_paper_list, vector_database_insert_paper, vector_database_contains_paper
+from .database_utils import sqlite_insert_paper_list, vector_database_insert_paper, vector_database_contains_paper
 
 
 def crawl_arxiv_meta_info(arxivID):

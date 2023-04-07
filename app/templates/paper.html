@@ -1,0 +1,223 @@
+<!-- this is the page for user to choose question set -->
+{% extends "UserBase.html" %}
+
+{% block content %}
+<!-- css for the paper page -->
+<style>
+body {font-family: Arial, Helvetica, sans-serif;}
+* {box-sizing: border-box;}
+/* Button used to open the chat form - fixed at the bottom of the page */
+.open-button {
+  background-color: #555;
+  color: white;
+  padding: 16px 20px;
+  border: none;
+  cursor: pointer;
+  opacity: 0.8;
+  position: fixed;
+  bottom: 60px;
+  right: 28px;
+  width: 280px;
+}
+
+/* The popup chat - hidden by default */
+.chat-popup {
+  display: none;
+  position: fixed;
+  bottom: 30px;
+  right: 15px;
+  border: 3px solid #f1f1f1;
+  z-index: 9;
+}
+
+/* Add styles to the form container */
+.form-container {
+  max-width: 300px;
+  padding: 10px;
+  background-color: white;
+}
+
+/* Full-width textarea */
+.form-container textarea {
+  width: 100%;
+  padding: 15px;
+  margin: 5px 0 22px 0;
+  border: none;
+  background: #f1f1f1;
+  resize: none;
+  min-height: 200px;
+}
+
+/* When the textarea gets focus, do something */
+.form-container textarea:focus {
+  background-color: #ddd;
+  outline: none;
+}
+
+/* Set a style for the submit/send button */
+.form-container .btn {
+  background-color: #04AA6D;
+  color: white;
+  padding: 16px 20px;
+  border: none;
+  cursor: pointer;
+  width: 100%;
+  margin-bottom:10px;
+  opacity: 0.8;
+}
+
+/* Add a red background color to the cancel button */
+.form-container .cancel {
+  background-color: #B31B1B;
+}
+
+/* Add some hover effects to buttons */
+.form-container .btn:hover, .open-button:hover {
+  opacity: 1;
+}
+.container {width: 80%;
+  border: 2px solid #dedede;
+  background-color: #f1f1f1;
+  border-radius: 5px;
+  padding: 10px;
+  margin: 10px 0;
+}
+/* Darker chat container */
+.right {
+  float: right;
+  border-color: #ccc;
+  background-color: #ddd;
+}
+.left {
+  float: left;
+}
+
+/* Style time text */
+.time-right {
+  float: right;
+  color: #aaa;
+}
+
+/* Style time text */
+.time-left {
+  float: left;
+  color: #999;
+}
+.loader {
+  border: 5px solid #f3f3f3; /* Light grey */
+  border-top: 5px solid #3498db; /* Blue */
+  border-radius: 50%;
+  width: 30px;
+  height: 30px;
+  animation: spin 2s linear infinite;
+  display:none
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+</style>
+
+<!-- The page is divided into two vertical part, one showing the pdf at the specified address, the other a continuous dialog box -->
+<div class="row">
+    <div class="col-md-6">
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                <h3 class="panel-title">Paper</h3>
+            </div>
+            <div class="panel-body" id = 'pdf'>
+                <button type="button" id="pdf-bnt">Show PDF</button>
+                <p>{{paper_url}}</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                <h3 class="panel-title">Questions</h3>
+            </div>
+            <div class="panel-body" id ="chat_content">
+                <!-- continuous dialog box, user can submit his message, and the server will reply it -->
+                <div class="container left">
+                    <p>Hello. How can I help you ?</p>
+                    <span class="time-right">Today</span>
+                  </div>
+            </div>
+                <!-- chatroom box -->
+                <button class="open-button" onclick="openForm()">Chat</button>
+                <div class="chat-popup" id="myForm">
+                <div class="form-container">
+                    <h1>Chatgpt </h1>
+                    <label for="msg"><b>Message</b><div class="loader" id = 'wait'></div></label>
+                    <textarea id="chat-input"></textarea>
+                    <button class="btn" id="gpt-button">Send</button>
+                    <button type="button" class="btn cancel" onclick="closeForm()">Close</button>
+                </div>
+            </div>
+
+
+        </div>
+    </div>
+
+    {% block javascript %}
+    <script>
+        $("#gpt-button").click(function(){
+        var date=new Date();
+        var time=date.toLocaleString();
+        question = $("#chat-input").val(); // global variable for the response function
+        if ($("#chat-input").val() == '') {
+            alert("Please enter your question");
+            return false;
+        }
+            let html_data = '';
+            html_data += `
+                <div class="container right">
+                    <p>${question}</p>
+                    <span class="time-left">${time}</span>
+                </div>
+            `;
+            $("#chat-input").val('');
+            $("#chat_content").append(html_data);
+        });
+        $("#gpt-button").click(function(){
+        var date=new Date();
+        var time=date.toLocaleString();
+        if (question == ''){
+            return false;}
+        $.ajax({
+            type: "POST",
+            url: "/chat_response",
+            beforeSend: function() { $('#wait').show(); },
+            complete: function() { $('#wait').hide(); },
+            data: {'prompt': question, "pid": "{{ paper.get_id() }}" },
+            success: function (data) {
+            let gpt_data = '';
+            gpt_data += `
+            <div class="container left">
+                    <p>${data.answer}</p>
+                    <span class="time-right">${time}</span>
+            </div>
+            `;
+        $("#chat_content").append(gpt_data);
+            }
+        });
+        });
+        $("#pdf-bnt").click(function(){
+            url = "{{ paper.get_pdf_url() }}" +".pdf";
+            let pdf_data = '';
+            pdf_data = `<embed src="${url}" width="100%" height="100%" frameborder="0"></embed>`;
+            $("#pdf").prepend(pdf_data);
+            this.style.visibility="hidden";
+        });
+        function openForm() {
+          document.getElementById("myForm").style.display = "block";
+        }
+
+        function closeForm() {
+          document.getElementById("myForm").style.display = "none";
+        }
+    </script>
+    {% endblock %}
+
+{% endblock %}

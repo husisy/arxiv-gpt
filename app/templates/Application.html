@@ -1,0 +1,50 @@
+{% extends "UserBase.html" %}
+
+{% block content %}
+<style type="text/css">
+  .log {
+    color: #FFFFFFFF;
+    font-size: 20px;
+  }
+
+  #particles-js {
+    width: 100%;
+    height: 72%;
+    margin-top: -350px;
+  }
+  /* extrnal lib */
+
+  body {
+    margin-bottom: 0px;
+    background: rgb(175, 174, 174);
+    font-family: "Helvetica Neue", Helvetica, Arial, "Microsoft Yahei UI", "Microsoft YaHei", SimHei, simsun, sans-serif;
+    -webkit-background-size: 100% 100%;
+    -moz-background-size: 100% 100%;
+    -o-background-size: 100% 100%;
+    background-size: 100% 100%;
+  }
+
+  /* Adapt to various browsers */
+  .bt {
+    position: relative;
+  }
+</style
+
+<br><br><br><br>
+<div class="welcome" style="color: #FFFFFFFF; width: 800px;margin: 0 auto;">
+  <h2 id="info">Welcome to Arxiv-gpt</h2>
+  <p>This is a platform that links GPT and arvix, which summarises papers and recommends papers. Here users can efficiently read papers and interact with chat GPT </p>
+  <a class="bt" href="{{ url_for('register') }}"><button type="button" class="btn btn-warning" style="margin:0 auto;display:block">
+        <span style="color:cornflowerblue">Register now<span></button></a>
+</div>
+<br><br>
+<div id="particles-js"></div>
+
+
+
+<script src="../static/particles.js"></script>
+<script src="../static/app.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/jquery@1.12.4/dist/jquery.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@3.3.7/dist/js/bootstrap.min.js"></script>
+
+  {% endblock %}

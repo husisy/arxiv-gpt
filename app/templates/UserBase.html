@@ -1,0 +1,80 @@
+<!-- this is the top nevigator, each page will extend from this html file -->
+<html>
+
+<head>
+    {% if title %}
+    <title>{{ title }} - Arxiv-gpt</title>
+    {% else %}
+    <title>Welcome to Arxiv-gpt</title>
+    {% endif %}
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@3.3.7/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="../static/login_css.css" type="text/css">
+    <link rel="stylesheet" href="../static/style6.css">
+    <style>
+        .f {
+            float: left;
+            margin-top: 8px;
+            color: grey;
+        }
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/jquery@1.12.4/dist/jquery.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@3.3.7/dist/js/bootstrap.min.js"></script>
+</head>
+<body>
+    <div class="loc_header">
+    <img src="../static/arxiv-logo-one-color-white.svg" width="100" height="100">
+    </div>
+    <nav class="navbar navbar-default" role="navigation">
+        <div class="container-fluid">
+            <div class="navbar-header">
+                <a class="navbar-brand" href="#">Arxiv-gpt</a>
+            </div>
+            <div>
+                <ul class="nav navbar-nav">
+                    <!-- if user has not login -->
+                    {% if current_user.is_anonymous %}
+                    <li><a href="{{ url_for('welcome') }}">Home</a></li>
+                    <li><a href="{{ url_for('login') }}">Login</a></li>
+                    <!-- if user is admin -->
+                    {% elif current_user.if_adm() %}
+                    <li><a href="{{ url_for('AdminWelcome') }}">Home</a></li>
+                    <li><a href="{{ url_for('User_management') }}">User management</a></li>
+                    <li><a href="{{ url_for('logout') }}">Logout</a></li>
+                    <!-- if user is not admin -->
+                    {% else %}
+                    <li><a href="{{ url_for('welcome') }}">Home</a></li>
+                    <li><a href="{{ url_for('logout') }}">Logout</a></li>
+                    {% endif %}
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    {% with messages = get_flashed_messages() %}
+    {% if messages %}
+    <ul id="get_flashed">
+        {% for message in messages %}
+        <li style="font-size: 14px;color:red;margin-left: 20px;">{{ message }}</li>
+        {% endfor %}
+    </ul>
+    {% endif %}
+    {% endwith %}
+    {% block content %}{% endblock %}
+    <!-- the block control statement to define 
+        the place where the derived templates 
+        can insert themselves. Blocks are given a unique name, 
+        which derived templates can reference 
+        when they provide their content. -->
+    
+    <br>
+    <footer class="footer navbar-fixed-bottom ">
+        <div class="loc_footer">
+            Designed by: ZHANG, ZHU, ZHOU
+        </div>
+    </footer>
+   
+
+</body>
+
+
+</html>

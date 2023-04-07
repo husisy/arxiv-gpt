@@ -6,8 +6,8 @@ import openai
 import openai.embeddings_utils
 import numpy as np
 
-from database_utils import sqlite3_load_all_paper_from, vector_database_find_close_chunk
-from crawl_utils import crawl_one_arxiv_paper
+from .database_utils import sqlite3_load_all_paper_from, vector_database_find_close_chunk
+from .crawl_utils import crawl_one_arxiv_paper
 
 # caller's duty to set openai.api_key
 class NaiveChatGPT:
