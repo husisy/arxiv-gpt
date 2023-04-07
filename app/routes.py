@@ -1,13 +1,17 @@
 # this page sets routes for each page
 from flask import render_template, flash, redirect, url_for, request, send_from_directory, jsonify
 from flask_login import logout_user, login_user, current_user, login_required
-from app.models import User, paper
-from app import app, db, controller
-from app.Form import LoginForm, RegistrationForm, messageForm
 from werkzeug.urls import url_parse
 from flask_wtf import FlaskForm
 from wtforms import SelectField, SubmitField
 from wtforms.validators import ValidationError, DataRequired
+
+
+from .models import User, paper
+from ._init import app, db
+from . import controller
+from .Form import LoginForm, RegistrationForm, messageForm
+
 
 # root page
 @app.route('/')
