@@ -190,7 +190,7 @@ body {font-family: Arial, Helvetica, sans-serif;}
             url: "/chat_response",
             beforeSend: function() { $('#wait').show(); },
             complete: function() { $('#wait').hide(); },
-            data: {'prompt': question, "pid": "{{ paper.get_id() }}" },
+            data: {'prompt': question, "arxivID": "{{ paper.get_arxivID() }}" },
             success: function (data) {
             let gpt_data = '';
             gpt_data += `

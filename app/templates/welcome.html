@@ -3,22 +3,42 @@
 
 <!-- welcome -->
 
-
-<div class="welcome">
-    What's up, {{ current_user.username }}
-</div>
 <!-- introduction -->
 <div class="intro col-lg-8 col-lg-offset-2">
     <h1>A bit introduction:</h1>
-    Here are arxiv papers recommended by Chatgpt:
+    You can input arxivID (something like "2209.10933") to search arxiv paper, if that paper is not in our database, we
+    will automatically download it and store it in our database. Usually, 1 minute later, you can search that paper again to start chatting with it.
+    <form action="{{ url_for('search_paper') }}" method="POST">
+        <textarea name="arxivID"></textarea>
+        <button type="submit" name="submit">Search</button>
+    </form>
+
+    {% for message in get_flashed_messages() %}
+        <div class="flash">{{ message }}</div>
+    {% endfor %}
+
+    Here are list of some arxiv papers:
 
     <!-- list all the paper from database -->
     <ul>
-    {% for paper in paper_list %}
-        <li> <a href="{{ url_for('get_paper',  paper_id = paper.get_id()) }}">{{ paper.get_title() }}</a></li>
-    {% endfor %}
+        {% for paper in paper_list %}
+        <li> <a href="{{ url_for('get_paper',  arxivID=paper.get_arxivID()) }}">{{paper.get_arxivID()}} </a> {{
+            paper.get_title() }} </li>
+        {% endfor %}
     </ul>
-</div>
 
+    <h1>How it works</h1>
+    <ul>
+        <li> download the targz file and pdf file from arxiv by arxivID (e.g. 2209.10933) </li>
+        <li> extract text content from latex file. If this fails, extract text from the pdf file </li>
+        <li> split the text into chunk, each chunk contains at most 400 tokens </li>
+        <li> use openai/GPT-Ada model to embedd each chunk into one vector (1536 dimensions) </li>
+        <li> given your query/question/message, find several most close chunks (cosine distance) </li>
+        <li> combine these close chunks and your query/question/message, put into chatgpt, that's it </li>
+    </ul>
+
+    <h1>Acknowledgement</h1>
+    This is a trial project inspired by ChatGPT developed by ZC, ZS, ZXR (alphabetical order). We are very grateful for their help.
+</div>
 
 {% endblock %}

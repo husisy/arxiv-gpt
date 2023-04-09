@@ -8,9 +8,9 @@ import numpy as np
 import lxml.etree
 
 from .utils import download_url_and_save, _MY_REQUEST_HEADERS
-from .text_utils import (extract_unknown_arxiv_file, try_except_make_main_tex_file,
+from .text import (extract_unknown_arxiv_file, try_except_make_main_tex_file,
             texpath_to_text_chunk, pdfpath_to_text_chunk, text_chunk_list_to_numpy_vector)
-from .database_utils import sqlite_insert_paper_list, vector_database_insert_paper, vector_database_contains_paper
+from .database import sqlite_insert_paper_list, vector_database_insert_paper, vector_database_contains_paper
 
 
 def crawl_arxiv_meta_info(arxivID):
@@ -97,10 +97,15 @@ def crawl_one_arxiv_paper(arxivID, tag_commit_sqlite3=False):
                 shutil.rmtree(hf_file('untar'))
 
         if not os.path.exists(chunk_text_json_path):
+            text_list = []
             if os.path.exists(tex_path):
                 print(f'[{arxivID}] convert tex to chunk_text')
-                text_list = texpath_to_text_chunk(tex_path)
-            else:
+                try:
+                    text_list = texpath_to_text_chunk(tex_path)
+                except Exception as e:
+                    print(e)
+                    print(f'[Error][crawl_utils.py/crawl_one_arxiv_paper] fail to convert tex to chunk_text')
+            if len(text_list)==0:
                 print(f'[{arxivID}] convert pdf to chunk_text')
                 text_list = pdfpath_to_text_chunk(pdf_path)
             with open(chunk_text_json_path, 'w', encoding='utf-8') as fid:
@@ -119,7 +124,6 @@ def crawl_one_arxiv_paper(arxivID, tag_commit_sqlite3=False):
                 print(f'[{arxivID}] vector_database already contains this paper')
             else:
                 if os.path.exists(vector_npy_path):
-                    print(f'[{arxivID}] vector_npy_path already exists')
                     embedding_np = np.load(vector_npy_path)
                     assert embedding_np.shape[0] == num_chunk
                 else:
@@ -141,8 +145,7 @@ def crawl_one_arxiv_paper(arxivID, tag_commit_sqlite3=False):
         ret = None
     return ret
 
-def crawl_arxiv_recent_paper():
-    url = "https://arxiv.org/list/quant-ph/recent"
+def crawl_arxiv_recent_paper(url):
     print(f'crawling {url}')
     response = requests.get(url, headers=_MY_REQUEST_HEADERS)
     response.raise_for_status()

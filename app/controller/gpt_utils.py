@@ -7,7 +7,7 @@ import openai.embeddings_utils
 import numpy as np
 
 from .database_utils import sqlite3_load_all_paper_from, vector_database_find_close_chunk
-from .crawl_utils import crawl_one_arxiv_paper
+# from .crawl_utils import crawl_one_arxiv_paper
 
 # caller's duty to set openai.api_key
 class NaiveChatGPT:
@@ -75,11 +75,11 @@ class ArxivChatGPT:
         self._db_paper_i = None
         self.use_local_npy = use_local_npy
 
-    def add_arxiv_paper_to_db(self, arxivID):
-        assert isinstance(arxivID, str)
-        crawl_one_arxiv_paper(arxivID, tag_commit_sqlite3=True)
-        self._db_paper_list = sqlite3_load_all_paper_from()
-        self.arxivID_list = [x['arxivID'] for x in self._db_paper_list]
+    # def add_arxiv_paper_to_db(self, arxivID):
+    #     assert isinstance(arxivID, str)
+    #     crawl_one_arxiv_paper(arxivID, tag_commit_sqlite3=True)
+    #     self._db_paper_list = sqlite3_load_all_paper_from()
+    #     self.arxivID_list = [x['arxivID'] for x in self._db_paper_list]
 
     def list_arxiv(self, num_print=-1):
         db_paper_list = self._db_paper_list
@@ -91,7 +91,7 @@ class ArxivChatGPT:
                 meta_info = json.load(f)
             print(f'[{ind0}]', x['arxivID'], meta_info['title'])
 
-    def select(self, index):
+    def select(self, index, print_meta_info=True):
         if isinstance(index, str):
             arxivID = index
             if arxivID not in self.arxivID_list:
@@ -103,11 +103,12 @@ class ArxivChatGPT:
                 print(f'Error: index {index} out of range [0, {len(self.arxivID_list)-1}]')
                 return
         self._db_paper_i = self._db_paper_list[index]
-        tmp0 = os.path.join(os.environ['ARXIV_DIRECTORY'], self._db_paper_i['meta_info_json_path'])
-        with open(tmp0, 'r') as f:
-            meta_info = json.load(f)
-        for key,value in meta_info.items():
-            print(f'[{key}]: {value}')
+        if print_meta_info:
+            tmp0 = os.path.join(os.environ['ARXIV_DIRECTORY'], self._db_paper_i['meta_info_json_path'])
+            with open(tmp0, 'r') as f:
+                meta_info = json.load(f)
+            for key,value in meta_info.items():
+                print(f'[{key}]: {value}')
         self.reset()
 
     def reset(self):

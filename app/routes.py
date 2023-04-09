@@ -1,16 +1,17 @@
-# this page sets routes for each page
+import os
 from flask import render_template, flash, redirect, url_for, request, send_from_directory, jsonify
 from flask_login import logout_user, login_user, current_user, login_required
 from werkzeug.urls import url_parse
 from flask_wtf import FlaskForm
 from wtforms import SelectField, SubmitField
 from wtforms.validators import ValidationError, DataRequired
+import sqlalchemy.sql.expression
 
 
-from .models import User, paper
+from .models import User, paper, paper_parse_queue
 from ._init import app, db
 from . import controller
-from .Form import LoginForm, RegistrationForm, messageForm
+from .Form import LoginForm, messageForm #RegistrationForm
 
 
 # root page
@@ -28,7 +29,7 @@ def login():
         return redirect(url_for('welcome'))
     form = LoginForm()
     if form.validate_on_submit():
-        user = User.query.filter_by(username=form.username.data).first()
+        user = User.query.filter_by(username=os.environ['ONLY_USER_NAME']).first()
         if user is None or not user.check_password(form.password.data):
             flash('Invalid username or password')
             return redirect(url_for('login'))
@@ -45,9 +46,11 @@ def login():
 @app.route('/welcome', methods=['GET', 'POST'])
 @login_required
 def welcome():
-    # TODO select some paper
-    paper_list = paper.query.all()
-    return render_template('welcome.html', title='Home', user = current_user,paper_list=paper_list)
+    # tmp0 = list(paper.query.limit(10))
+    # https://stackoverflow.com/a/60815/7290857
+    arxivID_list = db.session.execute(db.select(paper.arxivID).order_by(sqlalchemy.sql.expression.func.random()).limit(10)).all()
+    tmp0 = [paper.query.filter_by(arxivID=x[0]).first() for x in arxivID_list]
+    return render_template('welcome.html', title='Home', user=current_user, paper_list=tmp0)
 
 # route for welcome page of administrator
 @app.route('/AdminWelcome', methods=['GET', 'POST'])
@@ -60,28 +63,43 @@ def logout():
     logout_user()
     return redirect(url_for('index'))
 
-# route for register
-@app.route('/register', methods=['GET', 'POST'])
-def register():
-    form = RegistrationForm()
-    if form.validate_on_submit():
-        user = User(username=form.username.data, email=form.email.data)
-        user.set_password(form.password.data)
-        db.session.add(user)
-        db.session.commit()
-        if current_user.is_authenticated:
-            flash('Add a user')
-        else:
-            flash('Congratulations, you are now a registered user!')
-        return redirect(url_for('login'))
-    return render_template('Register.html', title='Register', form=form)
+# # route for register
+# @app.route('/register', methods=['GET', 'POST'])
+# def register():
+#     form = RegistrationForm()
+#     if form.validate_on_submit():
+#         user = User(username=form.username.data, email=form.email.data)
+#         user.set_password(form.password.data)
+#         db.session.add(user)
+#         db.session.commit()
+#         if current_user.is_authenticated:
+#             flash('Add a user')
+#         else:
+#             flash('Congratulations, you are now a registered user!')
+#         return redirect(url_for('login'))
+#     return render_template('Register.html', title='Register', form=form)
 
 # route for get paper
-@app.route('/get_paper/<paper_id>', methods=['GET', 'POST'])
+@app.route('/paper/<arxivID>', methods=['GET', 'POST'])
 @login_required
-def get_paper(paper_id):
-    paper_ins = paper.query.filter_by(pid=paper_id).first()
-    return render_template('paper.html', paper = paper_ins, title='paper_chat')
+def get_paper(arxivID):
+    tmp0 = paper.query.filter_by(arxivID=arxivID).first()
+    return render_template('paper.html', paper=tmp0, title='paper_chat')
+
+@app.route('/search', methods=['POST'])
+@login_required
+def search_paper():
+    arxivID = str(request.form.get('arxivID')).strip()
+    tmp0 = paper.query.filter_by(arxivID=arxivID).first()
+    if tmp0 is None:
+        # TODO: add this arxivID to paper_parse_queue table
+        db.session.add(paper_parse_queue(arxivID=arxivID))
+        db.session.commit()
+        flash("No such paper yet! we will add it soon! please search again 1 minute later (usually).")
+        ret = redirect(url_for('welcome'))
+    else:
+        ret = redirect(url_for('get_paper', arxivID=arxivID))
+    return ret
 
 # route for chat response
 @app.route('/chat_response', methods=['GET', 'POST'])
@@ -90,7 +108,7 @@ def chat_response():
     if request.method == 'POST':
         prompt = request.form['prompt']
         res = {}
-        res['answer'] = controller.reply_message(current_user.get_id(), request.form['pid'], prompt)
+        res['answer'] = controller.reply_message(current_user.get_id(), request.form['arxivID'], prompt)
     return jsonify(res), 200
 
 # route to remove, add and make other users admin

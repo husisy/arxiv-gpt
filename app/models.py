@@ -9,7 +9,6 @@ from ._init import login, db
 
 #the tables of sql and related caculations are wirtten here
 
-# User table
 class User(UserMixin,db.Model):
     uid = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(64), index=True, unique=True)
@@ -56,11 +55,12 @@ class paper(db.Model):
         return self.pid
     def get_arxivID(self):
         return self.arxivID
-    # get title from meta-info.json
+
     def get_title(self):
         with open(os.path.join(os.environ['ARXIV_DIRECTORY'], self.meta_info_json_path), 'r') as fid:
             meta_info = json.load(fid)
         return meta_info['title']
+
     def get_pdf_url(self):
         with open(os.path.join(os.environ['ARXIV_DIRECTORY'], self.meta_info_json_path), 'r') as fid:
             meta_info = json.load(fid)
@@ -76,6 +76,10 @@ class message(db.Model):
     time = db.Column(db.DateTime)
     def __repr__(self):
         return '<"message": {},'.format(self.content)+'"time": {}'.format(self.time)+">"
+
+class paper_parse_queue(db.Model):
+    ppqid = db.Column(db.Integer, primary_key=True) #useless
+    arxivID = db.Column(db.String(50), unique=True)
 
 # init_db() is used to initialize the database, it should be called only once
 def init_db():
@@ -95,8 +99,3 @@ def init_db():
     conn.commit()
     # show the table
     contents = c.execute("SELECT * FROM paper")
-    for row in contents:
-        print(row)
-
-# with app.app_context():
-#     init_db()

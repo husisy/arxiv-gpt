@@ -18,7 +18,7 @@ NOTICE
 
 ```bash
 micromamba create -n arxiv
-micromamba install -n arxiv -c conda-forge cython matplotlib h5py pillow protobuf scipy requests tqdm flask ipython openai python-dotenv tiktoken lxml tqdm pdfminer.six python-magic pylatexenc chardet flask-sqlalchemy flask-migrate flask-login wtforms flask-wtf email_validator
+micromamba install -n arxiv -c conda-forge cython matplotlib h5py pillow protobuf scipy requests tqdm flask ipython openai python-dotenv tiktoken lxml tqdm pdfminer.six python-magic pylatexenc chardet flask-sqlalchemy flask-migrate flask-login wtforms flask-wtf email_validator waitress
 micromamba activate arxiv
 pip install weaviate-client
 ```
@@ -166,4 +166,6 @@ misc
 
 ```bash
 tar czvf arxivgpt-db.tar.gz data
+nohup python main_crawl.py >/dev/null 2>&1 &
+nohup waitress-serve --listen="127.0.0.1:5001" "app:app" >/dev/null 2>&1 &
 ```

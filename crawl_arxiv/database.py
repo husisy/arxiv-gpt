@@ -4,7 +4,7 @@ import sqlite3
 import weaviate
 import numpy as np
 
-# TODO
+from .utils import _MY_REQUEST_HEADERS, download_url_and_save
 
 def sqlite_insert_paper_list(paper_list):
     paper_dict = {x['arxivID']:x for x in paper_list} #remove duplicate arxivID
@@ -38,6 +38,20 @@ def sqlite3_load_all_paper_from():
 # print('pid | arxivID | meta_info_json_path | pdf_path | tex_path | chunk_text_json_path | num_chunk')
 # for x in sqlite3_load_all_paper_from():
 #     print(x)
+
+
+def init_sqlite3_paper_parse_queue(remove_if_exist=False):
+    sql_conn = sqlite3.connect(os.environ['SQLITE3_DB_PATH'])
+    if remove_if_exist:
+        sql_conn.execute('DROP TABLE IF EXISTS paper_parse_queue')
+    cmd = '''create table if not exists paper_parse_queue (
+        ppqid integer primary key,
+        arxivID text
+    )
+    '''
+    sql_conn.execute(cmd)
+    sql_conn.commit()
+    sql_conn.close()
 
 
 def init_sqlite3_database(remove_if_exist=False):

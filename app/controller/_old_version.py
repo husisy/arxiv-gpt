@@ -6,7 +6,7 @@ from .database_utils import sqlite_get_arxivID_by_paper_id
 
 # The functions are used to interact with the database
 
-def reply_message(user_id, paper_id, content):
+def reply_message(user_id, arxivID, content):
     # conn = sqlite3.connect('app.db')
     # print('opened database successfully')
     # c = conn.cursor()
@@ -15,7 +15,7 @@ def reply_message(user_id, paper_id, content):
     # conn.commit()
     # print('successfully inserted')
     chatgpt = ArxivChatGPT()
-    chatgpt.select(sqlite_get_arxivID_by_paper_id(paper_id))
+    chatgpt.select(arxivID, print_meta_info=False)
     ret = chatgpt.chat(content, tag_print=False, tag_return=True)
     return ret
 
