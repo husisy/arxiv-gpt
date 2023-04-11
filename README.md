@@ -165,7 +165,17 @@ vector (ada-002)
 misc
 
 ```bash
-tar czvf arxivgpt-db.tar.gz data
-nohup python main_crawl.py >/dev/null 2>&1 &
-nohup waitress-serve --listen="127.0.0.1:5001" "app:app" >/dev/null 2>&1 &
+# turn on crawling process
+nohup python main_crawl.py >> log/main_crawl.log 2>&1 &
+
+# turn on website
+nohup waitress-serve --listen="127.0.0.1:5001" "app:app" >> log/waitress-serve.log 2>&1 &
+
+# turn off crawling process
+ps ax | grep main_crawl #get PID
+kill <PID> #replace <PID>
+
+# turn off website
+ps ax | grep waitress-serve #get PID
+kill <PID> #replace <PID>
 ```
