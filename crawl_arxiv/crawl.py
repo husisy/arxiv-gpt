@@ -120,16 +120,16 @@ def crawl_one_arxiv_paper(arxivID, tag_commit_sqlite3=False):
                 print(f'[{arxivID}] converting chunk_text to numpy vector')
                 embedding_np = text_chunk_list_to_numpy_vector([x[0] for x in text_list])
                 np.save(vector_npy_path, embedding_np)
-            if vector_database_contains_paper(arxivID):
-                print(f'[{arxivID}] vector_database already contains this paper')
-            else:
-                if os.path.exists(vector_npy_path):
-                    embedding_np = np.load(vector_npy_path)
-                    assert embedding_np.shape[0] == num_chunk
-                else:
-                    embedding_np = None
-                print(f'[{arxivID}] inserting paper into vector database')
-                uuid_list = vector_database_insert_paper(arxivID, text_list, embedding_np)
+            # if vector_database_contains_paper(arxivID):
+            #     print(f'[{arxivID}] vector_database already contains this paper')
+            # else:
+            #     if os.path.exists(vector_npy_path):
+            #         embedding_np = np.load(vector_npy_path)
+            #         assert embedding_np.shape[0] == num_chunk
+            #     else:
+            #         embedding_np = None
+            #     print(f'[{arxivID}] inserting paper into vector database')
+            #     uuid_list = vector_database_insert_paper(arxivID, text_list, embedding_np)
             # TODO should we save uuid_list to json file?
 
         ret = dict(arxivID=arxivID, num_chunk=num_chunk, meta_info_json_path=meta_info_json_path, pdf_path=pdf_path, tex_path=tex_path, chunk_text_json_path=chunk_text_json_path)

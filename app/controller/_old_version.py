@@ -14,7 +14,7 @@ def reply_message(user_id, arxivID, content):
     # c.execute(sql_query)
     # conn.commit()
     # print('successfully inserted')
-    chatgpt = ArxivChatGPT()
+    chatgpt = ArxivChatGPT(use_local_npy=True)
     chatgpt.select(arxivID, print_meta_info=False)
     ret = chatgpt.chat(content, tag_print=False, tag_return=True)
     return ret

@@ -27,6 +27,8 @@ if __name__=='__main__':
     # crawl_arxiv_recent_paper()
     # _update_existing_arxiv_data()
 
+    crawl_arxiv.database.init_vector_database()
+
     recent_url_list = ['https://arxiv.org/list/quant-ph/recent']
     arxivID_time_list = []
     last_query_time = None
